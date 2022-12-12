@@ -9,4 +9,5 @@ spring:
     config:
       enabled: true
       label: master
-      uri: http://localhost:7000
+      #uri: http://localhost:7000
+      uri: https://bnttdata-config-server.azurewebsites.net
