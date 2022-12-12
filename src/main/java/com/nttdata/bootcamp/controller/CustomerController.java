@@ -21,7 +21,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(value = "/customer")
 public class CustomerController {
-
+	//test
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class);
 	@Autowired
 	private CustomerService customerService;
