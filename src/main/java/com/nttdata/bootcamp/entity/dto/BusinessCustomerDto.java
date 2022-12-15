@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BusinessCustomerDto {
     private String dni;
-    private Boolean flagPyme;
     private String name;
     private String surName;
     private String address;

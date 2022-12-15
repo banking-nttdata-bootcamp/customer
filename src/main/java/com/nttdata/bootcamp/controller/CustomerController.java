@@ -49,7 +49,7 @@ public class CustomerController {
 		Mono.just(dataCustomer).doOnNext(t -> {
 			t.setDni(customer.getDni());
 			t.setTypeCustomer(Constant.PERSONAL_CUSTOMER);
-			t.setFlagVip(customer.getFlagVip());
+			t.setFlagVip(false);
 			t.setFlagPyme(false);
 			t.setName(customer.getName());
 			t.setSurName(customer.getSurName());
@@ -72,8 +72,8 @@ public class CustomerController {
 		Mono.just(dataCustomer).doOnNext(t -> {
 			t.setDni(customer.getDni());
 			t.setTypeCustomer(Constant.BUSINESS_CUSTOMER);
+			t.setFlagPyme(false);
 			t.setFlagVip(false);
-			t.setFlagPyme(customer.getFlagPyme());
 			t.setName(customer.getName());
 			t.setSurName(customer.getSurName());
 			t.setAddress(customer.getAddress());
