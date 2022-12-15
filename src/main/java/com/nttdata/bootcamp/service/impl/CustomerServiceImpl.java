@@ -31,8 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> save(Customer dataCustomer) {
-        Mono<Customer> customerMono = findByDni(dataCustomer.getDni());
-                customerMono
+        Mono<Customer> customerMono = findByDni(dataCustomer.getDni())
                 .flatMap(__ -> Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " YA EXISTE")))
                 .switchIfEmpty(customerRepository.save(dataCustomer));
         return customerMono;
