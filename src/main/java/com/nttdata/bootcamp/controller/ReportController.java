@@ -15,9 +15,9 @@ import java.util.ArrayList;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping(value = "/customer")
+@RequestMapping(value = "/report")
 public class ReportController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportController.class);
     @Autowired
     private CustomerService customerService;
 

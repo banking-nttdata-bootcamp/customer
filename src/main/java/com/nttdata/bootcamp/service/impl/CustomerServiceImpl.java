@@ -2,6 +2,7 @@ package com.nttdata.bootcamp.service.impl;
 
 import com.nttdata.bootcamp.entity.Customer;
 import com.nttdata.bootcamp.repository.CustomerRepository;
+import com.nttdata.bootcamp.service.kafka.CustomerEventsService;
 import com.nttdata.bootcamp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,13 @@ import reactor.core.publisher.Mono;
 public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+
+    private final CustomerEventsService customerEventsService;
+
+    public CustomerServiceImpl(CustomerEventsService customerEventsService) {
+        super();
+        this.customerEventsService = customerEventsService;
+    }
 
     @Override
     public Flux<Customer> findAll() {
@@ -33,7 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> save(Customer dataCustomer) {
         Mono<Customer> customerMono = findByDni(dataCustomer.getDni())
                 .flatMap(__ -> Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " YA EXISTE")))
-                .switchIfEmpty(customerRepository.save(dataCustomer));
+                .switchIfEmpty(saveCustomer(dataCustomer));
         return customerMono;
     }
 
@@ -43,9 +51,10 @@ public class CustomerServiceImpl implements CustomerService {
                 //.delayElement(Duration.ofMillis(1000));
         try {
             Customer customer = customerMono.block();
+            assert customer != null;
             customer.setAddress(dataCustomer.getAddress());
             customer.setModificationDate(dataCustomer.getModificationDate());
-            return customerRepository.save(customer);
+            return saveCustomer(customer);
         }catch (Exception e){
             return Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " NO EXISTE"));
         }
@@ -57,9 +66,10 @@ public class CustomerServiceImpl implements CustomerService {
         //.delayElement(Duration.ofMillis(1000));
         try {
             Customer customer = customerMono.block();
+            assert customer != null;
             customer.setStatus(dataCustomer.getStatus());
             customer.setModificationDate(dataCustomer.getModificationDate());
-            return customerRepository.save(dataCustomer);
+            return saveCustomer(customer);
         }catch (Exception e){
             return Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " NO EXISTE"));
         }
@@ -74,6 +84,12 @@ public class CustomerServiceImpl implements CustomerService {
         }catch (Exception e){
             return Mono.<Void>error(new Error("El cliente con dni " + dni + " NO EXISTE"));
         }
+    }
+
+    public Mono<Customer> saveCustomer(Customer dataCustomer){
+        Mono<Customer> monoCustomer = customerRepository.save(dataCustomer);
+        this.customerEventsService.publish(monoCustomer.block());
+        return monoCustomer;
     }
 
 }
