@@ -40,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Mono<Customer> save(Customer dataCustomer) {
         Mono<Customer> customerMono = findByDni(dataCustomer.getDni())
-                .flatMap(__ -> Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " YA EXISTE")))
+                .flatMap(__ -> Mono.<Customer>error(new Error("The customer with DNI" + dataCustomer.getDni() + " exists")))
                 .switchIfEmpty(saveCustomer(dataCustomer));
         return customerMono;
     }
@@ -56,7 +56,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setModificationDate(dataCustomer.getModificationDate());
             return saveCustomer(customer);
         }catch (Exception e){
-            return Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " NO EXISTE"));
+            return Mono.<Customer>error(new Error("The customer with DNI " + dataCustomer.getDni() + " do not exists"));
         }
     }
 
@@ -71,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setModificationDate(dataCustomer.getModificationDate());
             return saveCustomer(customer);
         }catch (Exception e){
-            return Mono.<Customer>error(new Error("El cliente con dni " + dataCustomer.getDni() + " NO EXISTE"));
+            return Mono.<Customer>error(new Error("The customer with DNI " + dataCustomer.getDni() + " do not exists"));
         }
     }
 
@@ -82,7 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             return customerRepository.delete(customerMono.block());
         }catch (Exception e){
-            return Mono.<Void>error(new Error("El cliente con dni " + dni + " NO EXISTE"));
+            return Mono.<Void>error(new Error("The customer with DNI" + dni + " do not exists"));
         }
     }
 
