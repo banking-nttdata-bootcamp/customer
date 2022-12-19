@@ -2,8 +2,8 @@ package com.nttdata.bootcamp.service.impl;
 
 import com.nttdata.bootcamp.entity.Customer;
 import com.nttdata.bootcamp.repository.CustomerRepository;
-import com.nttdata.bootcamp.service.kafka.CustomerEventsService;
 import com.nttdata.bootcamp.service.CustomerService;
+import com.nttdata.bootcamp.service.KafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,12 +15,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    private final CustomerEventsService customerEventsService;
-
-    public CustomerServiceImpl(CustomerEventsService customerEventsService) {
-        super();
-        this.customerEventsService = customerEventsService;
-    }
+    @Autowired
+    private KafkaService kafkaService;
 
     @Override
     public Flux<Customer> findAll() {
@@ -54,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
             assert customer != null;
             customer.setAddress(dataCustomer.getAddress());
             customer.setModificationDate(dataCustomer.getModificationDate());
-            return saveCustomer(customer);
+            return customerRepository.save(dataCustomer);
         }catch (Exception e){
             return Mono.<Customer>error(new Error("The customer with DNI " + dataCustomer.getDni() + " do not exists"));
         }
@@ -69,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
             assert customer != null;
             customer.setStatus(dataCustomer.getStatus());
             customer.setModificationDate(dataCustomer.getModificationDate());
-            return saveCustomer(customer);
+            return customerRepository.save(customer);
         }catch (Exception e){
             return Mono.<Customer>error(new Error("The customer with DNI " + dataCustomer.getDni() + " do not exists"));
         }
@@ -88,7 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Mono<Customer> saveCustomer(Customer dataCustomer){
         Mono<Customer> monoCustomer = customerRepository.save(dataCustomer);
-        this.customerEventsService.publish(monoCustomer.block());
+        this.kafkaService.publish(monoCustomer.block());
         return monoCustomer;
     }
 
