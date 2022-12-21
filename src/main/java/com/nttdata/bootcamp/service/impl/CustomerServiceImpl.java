@@ -4,10 +4,14 @@ import com.nttdata.bootcamp.entity.Customer;
 import com.nttdata.bootcamp.repository.CustomerRepository;
 import com.nttdata.bootcamp.service.CustomerService;
 import com.nttdata.bootcamp.service.KafkaService;
+import com.nttdata.bootcamp.service.RedisCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+import java.util.Optional;
 
 //Service implementation
 @Service
@@ -18,6 +22,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private KafkaService kafkaService;
 
+    @Autowired
+    private RedisCacheService redisCacheService;
+
     @Override
     public Flux<Customer> findAll() {
         Flux<Customer> customers = customerRepository.findAll();
@@ -26,10 +33,26 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> findByDni(String dni) {
-        Mono<Customer> customer = customerRepository
+        Mono<Customer> customer = Mono.empty();
+        Customer _customer = redisCacheService.retrieveCustomer(dni);
+
+        //If the customer object not available in the cache DB, then need to retrieve it from the Mongo DB.
+        if(_customer == null) {
+
+            customer = customerRepository
+                    .findAll()
+                    .filter(x -> x.getDni().equals(dni))
+                    .next();
+
+            assert Objects.requireNonNull(customer.block()).getDni() != null;
+            _customer = customer.block();
+
+        }
+
+        /*Mono<Customer> customer = customerRepository
                 .findAll()
                 .filter(x -> x.getDni().equals(dni))
-                .next();
+                .next();*/
         return customer;
     }
 
@@ -84,7 +107,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Mono<Customer> saveCustomer(Customer dataCustomer){
         Mono<Customer> monoCustomer = customerRepository.save(dataCustomer);
-        this.kafkaService.publish(monoCustomer.block());
+        redisCacheService.storeCustomer(monoCustomer.block().getDni(), monoCustomer.block());
+        kafkaService.publish(monoCustomer.block());
         return monoCustomer;
     }
 
