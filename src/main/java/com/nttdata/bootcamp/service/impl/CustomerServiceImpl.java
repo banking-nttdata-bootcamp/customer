@@ -44,15 +44,13 @@ public class CustomerServiceImpl implements CustomerService {
                     .filter(x -> x.getDni().equals(dni))
                     .next();
 
-            assert Objects.requireNonNull(customer.block()).getDni() != null;
-            _customer = customer.block();
+            if(customer.block() != null)
+                redisCacheService.storeCustomer(customer.block().getDni(), customer.block());
 
+        }else{
+            customer = Mono.just(_customer);
         }
 
-        /*Mono<Customer> customer = customerRepository
-                .findAll()
-                .filter(x -> x.getDni().equals(dni))
-                .next();*/
         return customer;
     }
 
