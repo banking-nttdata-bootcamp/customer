@@ -70,7 +70,7 @@ public class CustomerServiceImpl implements CustomerService {
             assert customer != null;
             customer.setAddress(dataCustomer.getAddress());
             customer.setModificationDate(dataCustomer.getModificationDate());
-            return customerRepository.save(dataCustomer);
+            return customerRepository.save(customer);
         }catch (Exception e){
             return Mono.<Customer>error(new Error("The customer with DNI " + dataCustomer.getDni() + " do not exists"));
         }
