@@ -57,8 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Mono<Customer> save(Customer dataCustomer) {
         Mono<Customer> customerMono = findByDni(dataCustomer.getDni())
-                .flatMap(__ -> Mono.<Customer>error(new Error("The customer with DNI" + dataCustomer.getDni() + " exists")))
-                .switchIfEmpty(saveCustomer(dataCustomer));
+                .switchIfEmpty(customerRepository.save(dataCustomer));
         return customerMono;
     }
 
@@ -103,11 +102,11 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    public Mono<Customer> saveCustomer(Customer dataCustomer){
-        Mono<Customer> monoCustomer = customerRepository.save(dataCustomer);
-        redisCacheService.storeCustomer(monoCustomer.block().getDni(), monoCustomer.block());
-        kafkaService.publish(monoCustomer.block());
-        return monoCustomer;
+    @Override
+    public Customer saveInitServices(Customer dataCustomer){
+        redisCacheService.storeCustomer(dataCustomer.getDni(), dataCustomer);
+        kafkaService.publish(dataCustomer);
+        return dataCustomer;
     }
 
 }

@@ -49,7 +49,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 	}
 
 	@Override
-	public Customer storeCustomer(String customerId, Customer customer) {
+	public Customer storeCustomer(String customerDni, Customer customer) {
 
 		Jedis jedis = null;
 
@@ -58,8 +58,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 			jedis = acquireJedisInstance();
 
 			String json = gson.toJson(customer);
-			jedis.set(customerId, json);
-			jedis.expire(customerId, sessiondataTTL);
+			jedis.set(customerDni, json);
+			jedis.expire(customerDni, sessiondataTTL);
 
 		} catch (Exception e) {
 			logger.error("Error occured while storing data to the cache ", e.getMessage());
@@ -74,7 +74,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 	}
 
 	@Override
-	public Customer retrieveCustomer(String customerId) {
+	public Customer retrieveCustomer(String customerDni) {
 
 		Jedis jedis = null;
 
@@ -82,7 +82,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
 			jedis = acquireJedisInstance();
 
-			String customerJson = jedis.get(customerId);
+			String customerJson = jedis.get(customerDni);
 
 			if (StringUtils.hasText(customerJson)) {
 				return gson.fromJson(customerJson, Customer.class);

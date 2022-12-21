@@ -13,5 +13,6 @@ public interface CustomerService {
     Mono<Customer> updateAddress(Customer dataCustomer);
     Mono<Customer> updateStatus(Customer dataCustomer);
     Mono<Void> delete(String dni);
+    Customer saveInitServices(Customer dataCustomer);
 
 }

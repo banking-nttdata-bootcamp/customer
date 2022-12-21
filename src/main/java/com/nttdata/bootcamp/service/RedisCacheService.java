@@ -8,9 +8,9 @@ import com.nttdata.bootcamp.entity.Customer;
  */
 public interface RedisCacheService {
 
-	Customer storeCustomer(String customerId, Customer customer);
+	Customer storeCustomer(String customerDni, Customer customer);
 
-	Customer retrieveCustomer(String customerId);
+	Customer retrieveCustomer(String customerDni);
 
 	void flushCustomerCache(String customerId);
 
