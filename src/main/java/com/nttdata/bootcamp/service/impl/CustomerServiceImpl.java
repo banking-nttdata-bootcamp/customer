@@ -19,6 +19,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+
     @Autowired
     private KafkaService kafkaService;
 
@@ -57,6 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Mono<Customer> save(Customer dataCustomer) {
         Mono<Customer> customerMono = findByDni(dataCustomer.getDni())
+
                 .switchIfEmpty(customerRepository.save(dataCustomer));
         return customerMono;
     }

@@ -52,7 +52,7 @@ class CustomerServiceImplTest {
 
     @Test
     void findByDni() {
-        /*Customer customer = new Customer();
+        Customer customer = new Customer();
         customer.setId("123");
         customer.setDni("72384351");
         customer.setTypeCustomer("PERSONAL");
@@ -66,10 +66,10 @@ class CustomerServiceImplTest {
         customer.setModificationDate(new Date());
 
         Mono<Customer> customerMono = Mono.just(customer);
-        when(customerRepository.findById(anyString()).thenReturn(customerMono));
+        when(customerRepository.findById("72384351").thenReturn(customerMono));
         Mono<Customer> customerMonoT = customerServiceImpl.findByDni("72384351");
         assertNotNull(customerMonoT);
-        assertEquals("72384351", customerMono.block().getDni());*/
+        assertEquals("72384351", customerMono.block().getDni());
     }
 
     @Test
